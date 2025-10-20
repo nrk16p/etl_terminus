@@ -194,6 +194,9 @@ with open("drivingdistance_data.json", "w", encoding="utf-8") as f:
     json.dump(records[:10], f, ensure_ascii=False, indent=2)
 print(f"✅ Prepared {len(records):,} records for upload.")
 
+
+from tqdm import tqdm
+
 # ---------------------------------------------------
 # 3️⃣  Send data in safe chunks to FastAPI backend
 # ---------------------------------------------------
@@ -209,12 +212,15 @@ def chunk_list(data, chunk_size=2000):
     for i in range(0, len(data), chunk_size):
         yield data[i:i + chunk_size]
 
-for idx, chunk in enumerate(chunk_list(records, 2000), start=1):
+print("\n🚀 Uploading data to FastAPI backend...")
+for idx, chunk in enumerate(tqdm(list(chunk_list(records, 2000)), desc="Uploading batches"), start=1):
     try:
         r = requests.post(url, headers=headers, json=chunk, timeout=120)
         if r.status_code == 200:
-            print(f"✅ Batch {idx}: Sent {len(chunk)} records successfully")
+            tqdm.write(f"✅ Batch {idx}: Sent {len(chunk)} records successfully")
         else:
-            print(f"⚠️ Batch {idx}: Failed with status {r.status_code} → {r.text}")
+            tqdm.write(f"⚠️ Batch {idx}: Failed ({r.status_code}) → {r.text[:120]}")
     except Exception as e:
-        print(f"❌ Batch {idx} error: {e}")
+        tqdm.write(f"❌ Batch {idx} error: {e}")
+
+print("\n🏁 All batches processed!")
