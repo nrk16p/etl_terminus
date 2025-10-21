@@ -6,10 +6,6 @@ pipeline {
         VENV_DIR = '.venv'
     }
 
-    triggers {
-        cron('H 7 * * *')  // run every day at 7am
-    }
-
     stages {
         stage('Checkout') {
             steps {
@@ -19,11 +15,11 @@ pipeline {
 
         stage('Install dependencies') {
             steps {
-                sh '''
+                sh '''#!/bin/bash
                 if [ ! -d "$VENV_DIR" ]; then
                     $PYTHON -m venv $VENV_DIR
                 fi
-                source $VENV_DIR/bin/activate
+                . $VENV_DIR/bin/activate
                 pip install --upgrade pip
                 pip install -r requirements.txt
                 '''
@@ -32,8 +28,8 @@ pipeline {
 
         stage('Run ETL script') {
             steps {
-                sh '''
-                source $VENV_DIR/bin/activate
+                sh '''#!/bin/bash
+                . $VENV_DIR/bin/activate
                 python main.py
                 '''
             }
