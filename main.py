@@ -200,7 +200,7 @@ from tqdm import tqdm
 # ---------------------------------------------------
 # 3️⃣  Send data in safe chunks to FastAPI backend
 # ---------------------------------------------------
-url = "https://be-analytics.onrender.com/docs/drivingdistance/bulk"
+url = "https://be-analytics.onrender.com/drivingdistance/bulk"
 
 # Add headers with x-token
 headers = {
